@@ -5,10 +5,130 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Slugroom</title>
+ <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f8ff;
+        }
+
+        /* Snail sprite styling */
+        .snail {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: contain;
+            display: block;
+            /*background-color: #6b4226;*/
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transition: transform 0.5s linear;
+        }
+    </style>
 </head>
 <body>
+    <h1> Welcome to the <b>Slugroom</b></h1>
 
-    <h1>Slugroom</h1>
+<script>
+    // Number of snails and an array of different snail sprites
+    const NUM_SNAILS = 5;
+    const snailSprites = [
+      'https://art.pixilart.com/de7bdbf3c5551ac.png',
+      'https://media.moddb.com/images/mods/1/62/61689/vbn.png',
+      'https://i2.pngimg.me/thumb/f/720/freesvgorg136528.jpg',
+      'https://dinopixel.com/preload/0423/Snail.png',
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTYgbUHcWjwFsmZwcwio7L0D0Ekgn46Jg120g&s',
+      'https://static.wikia.nocookie.net/mopeio/images/0/05/Snail-S2.png/revision/latest?cb=20220317163317',
+      'https://www.models-resource.com/resources/big_icons/23/22606.png?updated=1606853843'
+    ];
+
+    // Array to hold snail objects
+    const snails = [];
+
+    function createSnail() {
+        const snailDiv = document.createElement('div');
+        snailDiv.classList.add('snail');
+        
+        // Assign a random sprite from the snailSprites array
+        const randomSprite = snailSprites[Math.floor(Math.random() * snailSprites.length)];
+        snailDiv.style.backgroundImage = `url(${randomSprite})`;
+        snailDiv.style.backgroundSize = 'cover';
+
+        // Random initial position
+        const x = Math.random() * window.innerWidth;
+        const y = Math.random() * window.innerHeight;
+
+        // Append to body
+        document.body.appendChild(snailDiv);
+
+        // Initialize snail's data and movement direction with unique speed
+        const { dx, dy, speed } = getRandomDirectionAndSpeed();
+        return { element: snailDiv, x, y, dx, dy, speed };
+    }
+
+    function getRandomDirectionAndSpeed() {
+        const angle = Math.random() * 2 * Math.PI;
+        const speed = Math.random() * 0.8 + 0.2; // Random speed between 0.2 and 1.0
+        return {
+            dx: Math.cos(angle),
+            dy: Math.sin(angle),
+            speed: speed
+        };
+    }
+
+    function moveSnail(snail) {
+        // Update snail's position based on its unique speed
+        snail.x += snail.dx * snail.speed;
+        snail.y += snail.dy * snail.speed;
+
+        // Bounce off edges
+        if (snail.x < 0 || snail.x > window.innerWidth - snail.element.clientWidth) {
+            snail.dx = -snail.dx;
+            snail.x = Math.max(0, Math.min(snail.x, window.innerWidth - snail.element.clientWidth));
+        }
+        if (snail.y < 0 || snail.y > window.innerHeight - snail.element.clientHeight) {
+            snail.dy = -snail.dy;
+            snail.y = Math.max(0, Math.min(snail.y, window.innerHeight - snail.element.clientHeight));
+        }
+
+        // Apply new position
+        snail.element.style.left = `${snail.x}px`;
+        snail.element.style.top = `${snail.y}px`;
+
+        // Occasionally change direction
+        if (Math.random() < 0.01) {
+            const newDirection = getRandomDirectionAndSpeed();
+            snail.dx = newDirection.dx;
+            snail.dy = newDirection.dy;
+            snail.speed = newDirection.speed; // Update to a new unique speed
+        }
+    }
+
+    function animateSnails() {
+        snails.forEach(moveSnail);
+        requestAnimationFrame(animateSnails);
+    }
+
+    // Function to add a new snail every 5 seconds
+    setInterval(() => {
+        snails.push(createSnail());
+    }, 5000);
+
+    // start with 5 snails
+    for (let i=0; i < NUM_SNAILS; i++) {
+      snails.push(createSnail())
+    }
+
+
+    // Start initial animation
+    animateSnails();
+</script>
+
 </body>
 </html>
 
